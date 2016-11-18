@@ -33,6 +33,8 @@ RUN set -ex \
         build-essential \
         libblas-dev \
         liblapack-dev \
+        freetds-dev \ 
+        
     ' \
     && echo "deb http://http.debian.net/debian jessie-backports main" >/etc/apt/sources.list.d/backports.list \
     && apt-get update -yqq \
@@ -55,7 +57,7 @@ RUN set -ex \
     && pip install ndg-httpsclient \
     && pip install pyasn1 \
     && pip install psycopg2 \
-    && pip install airflow[postgresql,hive]==$AIRFLOW_VERSION \
+    && pip install "airflow[postgresql, mssql]"==$AIRFLOW_VERSION \
     && pip install celery==3.1.23 \
     && apt-get remove --purge -yqq $buildDeps libpq-dev \
     && apt-get clean \
