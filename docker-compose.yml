@@ -1,60 +1,57 @@
 version: '2'
 services:
-    postgres:
-      image: postgres
-      environment:
-        - POSTGRES_USER=airflow
-        - POSTGRES_PASSWORD=airflow
-        - POSTGRES_DB=airflow
-      ports:
-        - "5432:5432"
-      volumes:
-        - postgres:/var/lib/postgresql/data
-        - ~/Desktop:/home
-      network_mode: host
-
-    webserver:
-        image: puckel/docker-airflow
-        restart: always
-        depends_on:
-            - postgres
-        environment:
-            - LOAD_EX=n
-            - EXECUTOR=Local
-            - FERNET_KEY=lVbbHgb92LIJ95S1tMgHS5kp2zR9KCfcHqwpfVhz5Y8=
-        volumes:
-          - ./requirements.txt:/requirements.txt
-          - ../dags:/usr/local/airflow/dags
-        ports:
-            - "8080:8080"
-        command: webserver
-        network_mode: host
-
-    scheduler:
-        image: puckel/docker-airflow
-        restart: always
-        depends_on:
-            - webserver
-        # volumes:
-        #     - ./requirements.txt:/requirements.txt
-        #     - /Users/andy/Development/starfish-airflow/dags/:/usr/local/airflow/dags
-        volumes_from:
-          - webserver
-        environment:
-            - LOAD_EX=n
-            - FERNET_KEY=lVbbHgb92LIJ95S1tMgHS5kp2zR9KCfcHqwpfVhz5Y8=
-            - EXECUTOR=Local
-        command: scheduler 
-        network_mode: host
-    # archpass:
-    #   image: vimagick/openconnect
-    #   command: https://remote.uga.edu
-    #   # net: host
-    #   volumes:
-    #     - ./data:/etc/openconnect
-    #   stop_signal: SIGINT
-    #   restart: always
-    #   privileged: yes
-        
+  archpass:
+    image: archpass
+    entrypoint: /entrypoint.exp
+    privileged: yes
+    environment:
+      - ARCHPASS_USER=user
+      - ARCHPASS_PW=password
+    tty: true
+    devices:
+      - /dev/net/tun
+    ports:
+      - "5432:5432"
+      - "8080:8080"
+  postgres:
+    image: postgres
+    environment:
+      - POSTGRES_USER=airflow
+      - POSTGRES_PASSWORD=airflow
+      - POSTGRES_DB=airflow
+    volumes:
+      - postgres:/var/lib/postgresql/data
+      - ~/Desktop:/home
+    network_mode: "service:archpass"
+      
+  webserver:
+    image: docker-airflow-mssql
+    restart: always
+    depends_on:
+      - postgres
+    environment:
+      - LOAD_EX=n
+      - EXECUTOR=Local
+      - FERNET_KEY=lVbbHgb92LIJ95S1tMgHS5kp2zR9KCfcHqwpfVhz5Y8=
+    volumes:
+      - ./requirements.txt:/requirements.txt
+      - /Users/andy/Development/starfish-airflow/dags:/usr/local/airflow/dags
+    network_mode: "service:archpass"
+    command: webserver
+  scheduler:
+    image: docker-airflow-mssql
+    restart: always
+    depends_on:
+      - webserver
+    volumes_from:
+      - webserver
+    environment:
+      - LOAD_EX=n
+      - FERNET_KEY=lVbbHgb92LIJ95S1tMgHS5kp2zR9KCfcHqwpfVhz5Y8=
+      - EXECUTOR=Local
+    command: scheduler 
+    network_mode: "service:archpass"
 volumes:
   postgres:
+    external:
+      name: andy-postgres

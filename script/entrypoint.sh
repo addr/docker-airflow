@@ -3,7 +3,7 @@
 AIRFLOW_HOME="/usr/local/airflow"
 CMD="airflow"
 TRY_LOOP="10"
-POSTGRES_HOST="postgres"
+POSTGRES_HOST="localhost"
 POSTGRES_PORT="5432"
 RABBITMQ_HOST="rabbitmq"
 RABBITMQ_CREDS="airflow:airflow"
@@ -68,7 +68,7 @@ else
     exec $CMD version
   fi
   sed -i "s/executor = CeleryExecutor/executor = SequentialExecutor/" "$AIRFLOW_HOME"/airflow.cfg
-  sed -i "s#sql_alchemy_conn = postgresql+psycopg2://airflow:airflow@postgres/airflow#sql_alchemy_conn = sqlite:////usr/local/airflow/airflow.db#" "$AIRFLOW_HOME"/airflow.cfg
+  sed -i "s#sql_alchemy_conn = postgresql+psycopg2://airflow:airflow@localhost:5432/airflow#sql_alchemy_conn = sqlite:////usr/local/airflow/airflow.db#" "$AIRFLOW_HOME"/airflow.cfg
   echo "Initialize database..."
   $CMD initdb
   exec $CMD webserver

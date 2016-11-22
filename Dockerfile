@@ -1,8 +1,9 @@
 # VERSION 1.7.1.3-3
-# AUTHOR: Matthieu "Puckel_" Roisil
+# ORIGINAL AUTHOR: Matthieu "Puckel_" Roisil
+# REVISED BY: Andy Rice
 # DESCRIPTION: Basic Airflow container
-# BUILD: docker build --rm -t puckel/docker-airflow
-# SOURCE: https://github.com/puckel/docker-airflow
+# BUILD: docker build --rm -t andydrice/docker-airflow
+# SOURCE: https://github.com/addr/docker-airflow
 
 FROM debian:jessie
 MAINTAINER Puckel_
